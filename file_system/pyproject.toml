@@ -18,3 +18,8 @@ dependencies = [
 
 [project.scripts]
 file_system = "file_system.__main__:main"
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "file_system"
+]

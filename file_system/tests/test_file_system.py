@@ -1,6 +1,4 @@
 import pytest
-
-
 from file_system.file_system.file_system import FileSystem
 
 def setup_function(function):
@@ -39,3 +37,4 @@ def test_do_create(capsys):
     fs.do_list()
     output = capsys.readouterr()
     assert output.out == "dict_keys(['testDir', 'testFile'])\n"
+
