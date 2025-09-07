@@ -1,0 +1,20 @@
+# pyproject.toml
+
+[build-system]
+requires = ["setuptools>=65.5.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "file_system"
+version = "0.1.0"
+description = "A CLI application that creates an in memory file system."
+readme = "README.md"
+authors = [{ name = "Ariella Wolpin", email = "ariwolpin@gmail.com" }]
+
+dependencies = [
+    "pytest >= 8.4.2",
+]
+
+
+[project.scripts]
+file_system = "file_system.__main__:main"
