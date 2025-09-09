@@ -43,6 +43,21 @@ $ pytest
 
 
 ## Functionality
-path
+commands:
 
+`change_dir <directory_to_change_to>`
+
+`create <name>` (include optional  `--file` to make a file instead of directory)  
+
+`list`  will return list of files and directories of current directory
+
+`path`  will list the path of the current directory
+
+`read <file_name>` will return file content
+
+`search <search_term>` search for all files and directories with a certain term
+
+`write <file_to_write_to>` add content to a file 
+
+`help` get help
 
