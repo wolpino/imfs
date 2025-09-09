@@ -1,43 +1,33 @@
 import argparse
 import cmd
-from model import Node
+from typing import List
+from constants import NodeType
+from file_system_manager import FileSystemManager
+from models import Node
 
 class FileSystem(cmd.Cmd):
     prompt = "(In Memory FileSystem) >>"
     intro = "Welcome to a simple in-memory file system. Enter 'help' for avail commmands"
     
     def __init__(self):
-        super().__init__()
-        self.root = Node()
-        self.current_directory = self.root
-        self.current_path = ["/"]
-        self.root.name = "/"
+        self.manager = FileSystemManager()
 
-    def do_path(self, argline:str="") -> None:
+    def do_path(self, argline:str="") -> str:
         "Returns the current directory path"
-        #TODO make sure this return path > join array on /
-        print(self.current_path)
+        return self.manager.get_path()
 
-    def do_list(self, argline:str="") -> None:
+    def do_list(self, argline:str="") -> List[str]:
         "List files and directories in the current directory."
-        print(self.current_directory.children.keys())
+        return self.manager.list_children()
 
-    def do_create_dir(self, name: str) -> None:
-        #TODO combine creates and add file flag
-        "Create a file or directory in the current directory. Usage: create_file <name>"
-        newNode = Node()
-        newNode.name = name
-        newNode.isFile = False
-        self.current_directory.children[name] = newNode
+    def do_create(self, argline) -> str:
+        # parts = argline.split(' ', 1)
+        # if(len(parts) == 2):
+        #     >>>>FINISH HERE
+        #     >>>>get type from argline.
+   #     create(parts.name, parts.)
+
         print(f"Directory created")
-
-    def do_create_file(self, name: str) -> None:
-        "Create a file or directory in the current directory. Usage: create_file <name>"
-        newNode = Node()
-        newNode.name = name
-        newNode.isFile = args.file
-        self.current_directory.children[name] = newNode
-        print(f"File created")
 
     def do_write(self, argline:str):
         "Write content to a file. Usage: write <file_name> <content>"
