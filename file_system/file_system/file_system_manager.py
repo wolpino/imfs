@@ -1,8 +1,6 @@
-import argparse
-import cmd
 from typing import List
-from constants import SLASH, NodeType, Permission, Users
-from models import FileSystem, Node
+from file_system.file_system.constants import SLASH, NodeType, Permission, Users
+from file_system.file_system.models import FileSystem, Node
 
 class FileSystemManager():
     def __init__(self):
@@ -15,9 +13,9 @@ class FileSystemManager():
 
     # TODO implement additional action/permission clarity for better error
     def check_permissions(self, permission_level):
-        if self.user["permission"] < permission_level:
-            print("you do not have access to this file or directory")
-            return False
+        # if self.user["permission"] < permission_level:
+        #     print("you do not have access to this file or directory")
+        #     return False
         return True
 
     # TODO add an optional variable + function to get path for any file/dir
@@ -28,8 +26,7 @@ class FileSystemManager():
         else:     
             return f"{SLASH}{SLASH.join(self.current_path[1:])}"
 
-    # TODO implement recursive list to get all children of children etc
-    # TODO add flag to choo se children in current working directory, or all children below the current working directory
+    # TODO add flag to choose children in current working directory, or all children below the current working directory
     def list_children(self, argline:str="") -> List[str]:
         "List files and directories in the current directory."
         return list(self.current_directory.children.keys())
@@ -93,17 +90,17 @@ class FileSystemManager():
             return False
         return True
 
-    def create_directory(self, name: str, permission: Permission) -> Node:
+    def create_directory(self, name: str) -> Node:
         self._validate_name_availability(name)
-        dir_node = Node(name=name, type=NodeType.DIRECTORY, permissions=permission)
+        dir_node = Node(name=name, type=NodeType.DIRECTORY)
         self.current_directory.children[dir_node.name] = dir_node
         dir_node.parent = self.current_directory
         return dir_node
 
-    def create_file(self, name:str, permission: Permission) -> Node:
+    def create_file(self, name:str) -> Node:
         self._validate_name_availability(name)
         try:
-            file_node = Node(name=name, type=NodeType.FILE, permissions=permission)
+            file_node = Node(name=name, type=NodeType.FILE)
             self.current_directory.children[file_node.name] = file_node
             file_node.parent = self.current_directory
             print(file_node)
