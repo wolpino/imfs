@@ -43,7 +43,6 @@ $ pytest
 
 
 ## Functionality
-commands:
 
 `change_dir <directory_to_change_to>`
 
@@ -61,3 +60,10 @@ commands:
 
 `help` get help
 
+## Future functionality (partially implemented):
+
+- switch change user (this works, but without permissions it doesn't do anything)
+
+- set permission on files and directories (this is close, I think I need to get rid of my enum and write some tests)
+
+- walk through file_system and find first file at specific depth 

@@ -1,7 +1,7 @@
 import argparse
 import cmd
 from typing import List
-from constants import SLASH, NodeType
+from constants import SLASH, NodeType, Permission, Users
 from models import FileSystem, Node
 
 class FileSystemManager():
@@ -11,13 +11,21 @@ class FileSystemManager():
         self.current_path: List[str] = [self.file_system.root.name]
         self.search_term: str = ""
         self.requested_depth: int = 0
+        self.user = Users["Lisa"]
+
+    # TODO implement additional action/permission clarity for better error
+    def check_permissions(self, permission_level):
+        if self.user["permission"] < permission_level:
+            print("you do not have access to this file or directory")
+            return False
+        return True
 
     # TODO add an optional variable + function to get path for any file/dir
     def get_path(self) -> str:
         if self.current_directory.name == self.file_system.root:
+            print(self.user)
             return SLASH
-        else:
-            
+        else:     
             return f"{SLASH}{SLASH.join(self.current_path[1:])}"
 
     # TODO implement recursive list to get all children of children etc
@@ -36,8 +44,7 @@ class FileSystemManager():
                     path.append(child)
                     depth=+1
                     self._walk_subtree(current_dir.children[child], path, depth)
-        return f"{SLASH}{SLASH.join(path[1:])}"
-          
+        return f"{SLASH}{SLASH.join(path[1:])}"       
         
     # depth first search from current directory
     def _dfs(self, current: Node, search_results: List[str], path:List[str]) -> List[str]:
@@ -51,7 +58,6 @@ class FileSystemManager():
                 self._dfs(current_dir.children[child], search_results, path) # recursive call to move up the tree
         return search_results
 
-
     def search(self, search_term: str):
         search_results = []
         self.search_term = search_term
@@ -63,17 +69,21 @@ class FileSystemManager():
         results = self._walk_subtree(self.file_system.root, ["/"] , 0)
         return results
 
+    # change current directory to a child directory
     def update_to_child(self, dir_name: str) -> None:       
         self.current_path.append(dir_name)
-        self.current_directory = self.current_directory.children[dir_name]
+        if self.check_permissions(self.current_directory.children[dir_name].permission):
+            self.current_directory = self.current_directory.children[dir_name]
+        return
+    
+    # change current directory to a parent directory
+    def update_to_parent(self) -> None:  
+        if self.check_permissions(self.current_directory.permission):   
+            self.current_path.pop()
+            self.current_directory = self.current_directory.parent or self.file_system.root
         return
 
-    def update_to_parent(self) -> None:       
-        self.current_path.pop()
-        self.current_directory = self.current_directory.parent or self.file_system.root
-        return
-
-    # TODO add more validations and move to file
+    # TODO add more validations and move to seperate file
     def _validate_name_availability(self, name: str) -> bool:
         if name in self.current_directory.children.keys():
             print("File or directory already exists")
@@ -83,19 +93,17 @@ class FileSystemManager():
             return False
         return True
 
-    def create_directory(self, name: str) -> Node:
-        #TODO combine creates and add file flag
+    def create_directory(self, name: str, permission: Permission) -> Node:
         self._validate_name_availability(name)
-        dir_node = Node(name=name, type=NodeType.DIRECTORY)
+        dir_node = Node(name=name, type=NodeType.DIRECTORY, permissions=permission)
         self.current_directory.children[dir_node.name] = dir_node
         dir_node.parent = self.current_directory
         return dir_node
 
-    def create_file(self, name:str) -> Node:
-        print('into create file')
+    def create_file(self, name:str, permission: Permission) -> Node:
         self._validate_name_availability(name)
         try:
-            file_node = Node(name=name, type=NodeType.FILE)
+            file_node = Node(name=name, type=NodeType.FILE, permissions=permission)
             self.current_directory.children[file_node.name] = file_node
             file_node.parent = self.current_directory
             print(file_node)
@@ -116,12 +124,18 @@ class FileSystemManager():
         if not self._validate_file_exists(file):
             return "File not found"
         fileNode = self.current_directory.children[f"{file}"]
-        fileNode.content.append(content)
-        return fileNode
+        if self.check_permissions(fileNode.permission):
+            fileNode.content.append(content)
+            return fileNode
+        else:
+            #TODO fix error handling
+            return    
 
     def read(self, file: str):
-        "Read the content of a file. Usage: read <file_name>"
         file_node = self.current_directory.children[f"{file}"]
-        read_content = file_node.content
-        return list(read_content)
-    
+        if self.check_permissions(file_node.permission):
+            read_content = file_node.content
+            return list(read_content)
+        else:
+            #TODO fix error handling
+            return
