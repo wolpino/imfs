@@ -21,12 +21,13 @@ class FileSystemManager():
             return f"{SLASH}{SLASH.join(self.current_path[1:])}"
 
     # TODO implement recursive list to get all children of children etc
-    # TODO add flag to choose children in current working directory, or all children below the current working directory
+    # TODO add flag to choo se children in current working directory, or all children below the current working directory
     def list_children(self, argline:str="") -> List[str]:
         "List files and directories in the current directory."
         return list(self.current_directory.children.keys())
 
-    # depth first search from current directory
+    # TODO make this work :(
+    # walk tree from current dir to first node [n] layers deep
     def _walk_subtree(self, current: Node, path:List[str], depth) -> str:
         while depth <= self.requested_depth:
             if current.type != str(NodeType.FILE) or current.children != []:
