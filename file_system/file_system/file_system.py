@@ -21,13 +21,13 @@ class FileSystem(cmd.Cmd):
         return self.manager.list_children()
 
     def do_create(self, argline) -> str:
-        # parts = argline.split(' ', 1)
-        # if(len(parts) == 2):
-        #     >>>>FINISH HERE
-        #     >>>>get type from argline.
-   #     create(parts.name, parts.)
+        parts = argline.split(' ', 1)
+        if(len(parts) == 2) and parts.flag:
+            self.manager.create_file(parts.name)
+        else:
+            self.manager.create_directory(parts.name)
 
-        print(f"Directory created")
+        return "Directory created"
 
     def do_write(self, argline:str):
         "Write content to a file. Usage: write <file_name> <content>"

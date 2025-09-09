@@ -16,6 +16,9 @@ class Node:
         self.children: dict[str, 'Node'] = {}
 
         self.parent: Optional['Node'] = parent
+    
+    def get_content(self):
+        return self.content
 
 
 class FileSystem:

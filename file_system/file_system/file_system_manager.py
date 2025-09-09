@@ -66,32 +66,45 @@ class FileSystemManager():
             return False
         return True
 
-    def create(self, name: str, type=NodeType.DIRECTORY, parent=None) -> Node:
+    def create_directory(self, name: str) -> Node:
+        #TODO combine creates and add file flag
         self._validate_name_availability(name)
-        newNode = Node(name, type, self.current_directory)
-        self.current_directory.children[newNode.name] = newNode
-        print(newNode)
-        return newNode
+        dir_node = Node(name=name, type=NodeType.DIRECTORY)
+        self.current_directory.children[dir_node.name] = dir_node
+        dir_node.parent = self.current_directory
+        return dir_node
+
+    def create_file(self, name:str) -> Node:
+        print('into create file')
+        self._validate_name_availability(name)
+        try:
+            file_node = Node(name=name, type=NodeType.FILE)
+            self.current_directory.children[file_node.name] = file_node
+            file_node.parent = self.current_directory
+            print(file_node)
+            return file_node
+
+        except Exception as e:
+            print(e.__dict__)
+            raise e
 
     def _validate_file_exists(self, file: str) -> bool:
         if file not in self.current_directory.children.keys():
             return False
-        if not self.current_directory.children[file].type == NodeType.DIRECTORY:
+        if self.current_directory.children[file].type == NodeType.DIRECTORY:
             return False
         return True
 
     def write(self, file: str, content: str):
         if not self._validate_file_exists(file):
             return "File not found"
-        fileNode = self.current_directory.children[file]
-        print(fileNode.__dict__)
-
+        fileNode = self.current_directory.children[f"{file}"]
         fileNode.content.append(content)
         return fileNode
 
     def read(self, file: str):
         "Read the content of a file. Usage: read <file_name>"
-        file_node = self.current_directory.children[file]
+        file_node = self.current_directory.children[f"{file}"]
         read_content = file_node.content
         return list(read_content)
     

@@ -23,38 +23,39 @@ def test_list_children(file_system_manager):
 def test_create_directory_by_default(file_system_manager):
     name = "testy"
     expected_type: NodeType = NodeType.DIRECTORY
-    actual_node = file_system_manager.create(name)
+    actual_node = file_system_manager.create_directory(name)
     assert actual_node.name == name
     assert actual_node.type.value == expected_type.value
 
 def test_create_file(file_system_manager):
     name = "testy_file"
-    actual_node = file_system_manager.create(name, NodeType.FILE, file_system_manager.current_directory)
+    expected_type: NodeType = NodeType.FILE
+    actual_node = file_system_manager.create_file(name)
     assert actual_node.name == name
-    assert actual_node.type == NodeType.FILE
-
+    assert actual_node.type.value == expected_type.value
 
 def test_write(file_system_manager):
     expected_file_name ="testFile"
-    expected_content="word word words"
-    
-    file = file_system_manager.create(expected_file_name, NodeType.FILE, file_system_manager.current_directory)
-    actual_file = file_system_manager.write(file=file.name, content=expected_content)
-    assert expected_content == actual_file
-    assert expected_file_name == actual_file
+    content_to_add="word word words"
+    expected_content=["word word words"]
+    file_node = file_system_manager.create_file(expected_file_name)
+    updated_node = file_system_manager.write(file=file_node.name, content=content_to_add)
+    # TODO figure out why __dict__ is necessary//check code for other issues
+    assert expected_content == updated_node.__dict__['content']
+    assert expected_file_name == updated_node.__dict__['name']
 
 def test_read(file_system_manager):
     expected_file ="testFile"
-    expected_content_1="word word words"
-    expected_content_2="evenmorewords"
-    expected_content=[expected_content_1, expected_content_2]
+    content_1="word word words"
+    content_2="evenmorewords"
+    expected_content_1=[content_1]
+    expected_content_2=[content_1, content_2]
 
-    inital_file = file_system_manager.create(expected_file, NodeType.FILE, file_system_manager.current_directory)
-    updated_file = file_system_manager.write(inital_file.name, expected_content_1)
-    
-    assert file_system_manager.read(updated_file.name) == [expected_content_1]
-    assert updated_file.content == [expected_content_1]
+    inital_file = file_system_manager.create_file(expected_file)
+    updated_file = file_system_manager.write(inital_file.name, content_1)
+    assert file_system_manager.read(updated_file.name) == expected_content_1
+    assert updated_file.__dict__['content'] == expected_content_1
 
-    updated_file_2 = file_system_manager.write(expected_file, expected_content_2)
-    assert file_system_manager.read(updated_file_2) == [expected_content_1]
-    assert updated_file_2.content == expected_content
+    updated_file_2 = file_system_manager.write(expected_file, content_2)
+    assert file_system_manager.read(updated_file_2.name) == expected_content_2
+    assert updated_file_2.__dict__['content'] == expected_content_2
