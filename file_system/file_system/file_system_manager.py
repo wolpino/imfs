@@ -10,32 +10,43 @@ class FileSystemManager():
         self.current_directory: Node = self.file_system.root
         self.current_path: List[str] = [self.file_system.root.name]
         self.search_term: str = ""
+        self.requested_depth: int = 0
 
     # TODO add an optional variable + function to get path for any file/dir
     def get_path(self) -> str:
         if self.current_directory.name == self.file_system.root:
             return SLASH
         else:
-            return f"{SLASH.join(self.current_path[:])}"
+            
+            return f"{SLASH}{SLASH.join(self.current_path[1:])}"
 
     # TODO implement recursive list to get all children of children etc
+    # TODO add flag to choose children in current working directory, or all children below the current working directory
     def list_children(self, argline:str="") -> List[str]:
         "List files and directories in the current directory."
         return list(self.current_directory.children.keys())
 
     # depth first search from current directory
+    def _walk_subtree(self, current: Node, path:List[str], depth) -> str:
+        while depth <= self.requested_depth:
+            if current.type != str(NodeType.FILE) or current.children != []:
+                current_dir = current
+                for child in current_dir.children.keys():
+                    path.append(child)
+                    depth=+1
+                    self._walk_subtree(current_dir.children[child], path, depth)
+        return f"{SLASH}{SLASH.join(path[1:])}"
+          
+        
+    # depth first search from current directory
     def _dfs(self, current: Node, search_results: List[str], path:List[str]) -> List[str]:
-        # save paths for 
         if current.name == self.search_term:
-            path_name = f"{SLASH.join(path[:])}"
+            path_name = f"{SLASH}{SLASH.join(path[1:])}"
             search_results.append(path_name)
-        current_dir = current
-        path.append(current_dir.name)
-        for child in current_dir.children.keys():
-            if current_dir.children[child].type == str(NodeType.FILE) or current_dir.children[child].children == {}:
-                return search_results
-            # if the current path element is the current directory, set the current directory pointer
-            else:
+        if current.type != str(NodeType.FILE) or current.children != []:
+            current_dir = current
+            for child in current_dir.children.keys():
+                path.append(child)
                 self._dfs(current_dir.children[child], search_results, path) # recursive call to move up the tree
         return search_results
 
@@ -44,6 +55,11 @@ class FileSystemManager():
         search_results = []
         self.search_term = search_term
         results = self._dfs(self.current_directory, search_results, self.current_path)
+        return results
+    
+    def walk_to_depth(self, depth: int):
+        self.requested_depth = depth
+        results = self._walk_subtree(self.file_system.root, ["/"] , 0)
         return results
 
     def update_to_child(self, dir_name: str) -> None:       

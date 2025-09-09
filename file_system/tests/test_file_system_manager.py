@@ -4,8 +4,8 @@ from file_system.file_system.file_system_manager import FileSystemManager
 
 @pytest.fixture()
 def file_system_manager():
-    fsm = FileSystemManager()
-    yield fsm
+    file_system_managerm = FileSystemManager()
+    yield file_system_managerm
 
 def test_get_path(file_system_manager):
     # initial path should be root
@@ -59,3 +59,94 @@ def test_read(file_system_manager):
     updated_file_2 = file_system_manager.write(expected_file, content_2)
     assert file_system_manager.read(updated_file_2.name) == expected_content_2
     assert updated_file_2.__dict__['content'] == expected_content_2
+
+
+def test_update_to_child(file_system_manager):
+    name = "testy_file"
+    actual_node = file_system_manager.create_directory(name)
+    assert file_system_manager.current_directory.name == "/"
+    assert actual_node.name == name
+    file_system_manager.update_to_child(actual_node.name)
+    assert file_system_manager.current_directory.name == actual_node.name
+
+def test_update_to_parent(file_system_manager):
+    root_node = file_system_manager.file_system.root
+    name = "testy_file"
+    actual_node = file_system_manager.create_directory(name)
+    assert file_system_manager.current_directory.name == "/"
+    assert actual_node.name == name
+    file_system_manager.update_to_child(actual_node.name)
+    assert file_system_manager.current_directory.name == actual_node.name
+    file_system_manager.update_to_parent() 
+    assert file_system_manager.current_directory.name == root_node.name
+
+
+def _tree_to_search(file_system_manager):
+    file_system_manager.create_directory(name="testDir_1")
+    file_system_manager.create_directory(name="testDir_4")
+    file_system_manager.create_directory(name="testDir_5")
+    file_system_manager.create_directory(name="testDir_6")
+    file_system_manager.create_directory("testDir_1")
+    file_system_manager.create_directory(name="testDir_2")
+    file_system_manager.create_file("testy2")
+    file_system_manager.create_file("testy")
+    file_system_manager.update_to_child("testDir_2")
+    file_system_manager.create_file("secret")
+    file_system_manager.update_to_parent()
+    file_system_manager.create_directory(name="testDir_3")
+    file_system_manager.update_to_child("testDir_3")
+    file_system_manager.create_directory("mystery")
+    file_system_manager.update_to_parent()
+    file_system_manager.create_file("mystery")
+    return file_system_manager
+
+def test_do_search_one_result(file_system_manager):
+    _tree_to_search(file_system_manager)
+    # TODO deal with excess of slashes :(
+    expected = ['/testDir_1/testDir_4/testDir_5/testDir_6/testDir_2/secret']
+    results = file_system_manager.search("secret") 
+    assert results == expected
+
+def test_do_search_two_results(file_system_manager):
+    _tree_to_search(file_system_manager)
+    # TODO deal with excess of slashes :(
+    expected = [
+                    '/testDir_1/testDir_4/testDir_5/testDir_6/testDir_2/secret/testy2/testy/testDir_3/mystery',
+                    '/testDir_1/testDir_4/testDir_5/testDir_6/testDir_2/secret/testy2/testy/testDir_3/mystery/mystery',
+                ]
+
+    results = file_system_manager.search("mystery") 
+    assert results == expected
+
+def _tree_to_walk(file_system_manager):
+    file_system_manager.create_directory(name="testDir_1")
+    file_system_manager.create_directory(name="testDir_4")
+    file_system_manager.create_directory(name="testDir_5")
+    file_system_manager.create_directory(name="testDir_6")
+    file_system_manager.create_directory("testDir_1")
+    file_system_manager.create_directory(name="testDir_2")
+    file_system_manager.create_file("testy2")
+    file_system_manager.create_file("testy")
+    file_system_manager.update_to_child("testDir_2")
+    file_system_manager.create_file("secret")
+    file_system_manager.update_to_parent()
+    file_system_manager.create_directory(name="testDir_3")
+    file_system_manager.update_to_child("testDir_3")
+    file_system_manager.create_directory("mystery")
+    file_system_manager.update_to_parent()
+    file_system_manager.create_file("mystery")
+    file_system_manager.create_directory("deep")
+    file_system_manager.update_to_child("deep")
+    file_system_manager.create_directory("deeper")
+    file_system_manager.update_to_child("deeper")
+    file_system_manager.create_directory("muchdeeper")
+    file_system_manager.update_to_child("muchdeeper")
+    file_system_manager.create_directory("evenmoredeeper")
+    file_system_manager.update_to_child("evenmoredeeper")
+    file_system_manager.create_file("deepest")
+
+# def test_walk_subtree(file_system_manager):
+#     _tree_to_walk(file_system_manager)
+#     expected_path = "this"
+#     path = file_system_manager.walk_to_depth(4)
+#     assert path == expected_path

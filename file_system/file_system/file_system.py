@@ -1,11 +1,11 @@
 import argparse
-import cmd
+import cmd2
 from typing import List
 from constants import NodeType
 from file_system_manager import FileSystemManager
 from models import Node
 
-class FileSystem(cmd.Cmd):
+class FileSystemCli():
     prompt = "(In Memory FileSystem) >>"
     intro = "Welcome to a simple in-memory file system. Enter 'help' for avail commmands"
     
@@ -62,6 +62,14 @@ args = parser.parse_args()
 
     
 if __name__ == "__main__":
-    FileSystem().cmdloop()
+    try:
+        FileSystemCli()
+    except BaseException:
+        import sys
+        print(sys.exc_info()[0])
+        import traceback
+        print(traceback.format_exc())
+        print("Press Enter to continue ...")
+        input() 
 
     
