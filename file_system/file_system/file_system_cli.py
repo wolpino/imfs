@@ -65,10 +65,10 @@ class FileSystemCli(cmd2.Cmd):
         """ create a file or directory create <name> (creates directory by default add -f to create a file)"""
         try:
             if args.file:
-                created = self.manager.create_file(str(args.name), args.permission)
+                created = self.manager.create_file(str(args.name))
                 print("created!")
             else:
-                created = self.manager.create_directory(args.name, args.permission)
+                created = self.manager.create_directory(args.name)
         except Exception as e:
             # TODO add more specific exception excepts to give a better error message
             print(f"oopsie")
