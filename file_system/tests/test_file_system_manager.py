@@ -80,7 +80,6 @@ def test_update_to_parent(file_system_manager):
     file_system_manager.update_to_parent() 
     assert file_system_manager.current_directory.name == root_node.name
 
-
 def _tree_to_search(file_system_manager):
     file_system_manager.create_directory(name="testDir_1")
     file_system_manager.create_directory(name="testDir_4")

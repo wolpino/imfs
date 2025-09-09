@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 SLASH = "/"
 
 class NodeType(Enum):

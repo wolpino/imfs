@@ -44,8 +44,7 @@ class FileSystemManager():
                     path.append(child)
                     depth=+1
                     self._walk_subtree(current_dir.children[child], path, depth)
-        return f"{SLASH}{SLASH.join(path[1:])}"
-          
+        return f"{SLASH}{SLASH.join(path[1:])}"       
         
     # depth first search from current directory
     def _dfs(self, current: Node, search_results: List[str], path:List[str]) -> List[str]:
@@ -58,7 +57,6 @@ class FileSystemManager():
                 path.append(child)
                 self._dfs(current_dir.children[child], search_results, path) # recursive call to move up the tree
         return search_results
-
 
     def search(self, search_term: str):
         search_results = []
@@ -141,4 +139,3 @@ class FileSystemManager():
         else:
             #TODO fix error handling
             return
-    

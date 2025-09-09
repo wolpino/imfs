@@ -1,13 +1,11 @@
-import argparse
 import logging
 import cmd2
-from constants import NodeType, Permission, Users, help_category
+from constants import NodeType, Users, help_category
 from file_system_manager import FileSystemManager
 
 class FileSystemCli(cmd2.Cmd):
     intro = "Welcome to your in memory file system"
     prompt = '>>imfs>> '
-    
 
     logger = logging.Logger
     
@@ -15,13 +13,11 @@ class FileSystemCli(cmd2.Cmd):
         super().__init__()
         self.manager = FileSystemManager()
         
-
-    
+    #TODO refactor to parser file
     create_argparser = cmd2.Cmd2ArgumentParser()
     create_argparser.add_argument('name', type=str, help= "the new directory or file name")
     create_argparser.add_argument('-f', '--file', action='store_true', help="add file to create a file")
     create_argparser.add_argument('-p', '--permission', type=str, choices=["Lisa","Bart","Marge","Homer"], help="set read/write permissions on files and directories")
-
 
     change_dir_argparser = cmd2.Cmd2ArgumentParser()
     change_dir_argparser.add_argument('dir_name', type=str, help= "the new directory or file name")
@@ -162,7 +158,6 @@ class FileSystemCli(cmd2.Cmd):
             print(f"oopsie")
             print(e)
     
-        
     
 if __name__ == "__main__":
     FileSystemCli().cmdloop()    
