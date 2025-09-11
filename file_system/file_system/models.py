@@ -4,7 +4,7 @@ from file_system.constants import NodeType, Permission
 
 
 class Node:
-    """ a tree node that represents a directory or a file """
+    """A node that represents a directory or a file."""
     def __init__(self, name, type, parent=None, permissions=0):
         # the name of the file or directory 
         self.name: str = name
@@ -18,13 +18,10 @@ class Node:
         self.parent: Optional['Node'] = parent
         # required permission level
         self.permission: int = 0
-    
-    def get_content(self):
-        return self.content
 
 
 class FileSystem:
-    """tree structure to hold file system"""
+    """Tree structure to hold file system nodes."""
     def __init__(self):
         self.root = Node("/", NodeType.ROOT, None)
         self.name = '/'     

@@ -15,32 +15,32 @@ class FileSystemCli(cmd2.Cmd):
         
     #TODO refactor to parser file
     create_argparser = cmd2.Cmd2ArgumentParser()
-    create_argparser.add_argument('name', type=str, help= "the new directory or file name")
-    create_argparser.add_argument('-f', '--file', action='store_true', help="add file to create a file")
-    create_argparser.add_argument('-p', '--permission', type=str, choices=["Lisa","Bart","Marge","Homer"], help="set read/write permissions on files and directories")
+    create_argparser.add_argument('name', type=str, help= "The name of the new directory or file.")
+    create_argparser.add_argument('-f', '--file', action='store_true', help="Add --file to create a file")
+    # create_argparser.add_argument('-p', '--permission', type=str, choices=["Lisa","Bart","Marge","Homer"], help="set read/write permissions on files and directories")
 
     change_dir_argparser = cmd2.Cmd2ArgumentParser()
-    change_dir_argparser.add_argument('dir_name', type=str, help= "the new directory or file name")
+    change_dir_argparser.add_argument('dir_name', type=str, help= "Directory to move to")
 
     write_argparser = cmd2.Cmd2ArgumentParser()
-    write_argparser.add_argument('name', type=str, help= "file name to write to")
-    write_argparser.add_argument('content', type=str, help="content to add file")
+    write_argparser.add_argument('name', type=str, help= "File to write to")
+    write_argparser.add_argument('content', type=str, help="Content to add to file")
 
     read_argparser = cmd2.Cmd2ArgumentParser()
-    read_argparser.add_argument('name', type=str, help= "name of file you want to read")
+    read_argparser.add_argument('name', type=str, help= "Name of file you want to read")
 
     search_argparser = cmd2.Cmd2ArgumentParser()
-    search_argparser.add_argument('search_term', type=str, help= "file name you'd like to search for")
+    search_argparser.add_argument('search_term', type=str, help= "Name of file/directory you'd like to search for")
 
     switch_argparser = cmd2.Cmd2ArgumentParser()
-    switch_argparser.add_argument('user', type=str, choices=["Lisa","Bart","Marge","Homer"], help="Switch to a new user by choosing from the choices")
+    # switch_argparser.add_argument('user', type=str, choices=["Lisa","Bart","Marge","Homer"], help="Switch to a new user by choosing from the choices")
 
     general_argparser = cmd2.Cmd2ArgumentParser()
 
     @cmd2.with_category(help_category)
     @cmd2.with_argparser(general_argparser)
     def do_path(self, args):
-        """Returns the current directory path"""
+        """Returns the current directory path. Usage: path"""
         try:
             path = self.manager.get_path()
             print(path)
@@ -51,7 +51,7 @@ class FileSystemCli(cmd2.Cmd):
     @cmd2.with_category(help_category)
     @cmd2.with_argparser(general_argparser)
     def do_list_contents(self, args):
-        """List files and directories in the current directory."""
+        """Returns list of files and directories in the current directory. Usage: list_contents"""
         try:
            list = self.manager.list_children()    
            print(list) 
@@ -62,13 +62,18 @@ class FileSystemCli(cmd2.Cmd):
     @cmd2.with_category(help_category)
     @cmd2.with_argparser(create_argparser)
     def do_create(self, args):
-        """ create a file or directory create <name> (creates directory by default add -f to create a file)"""
+        """ Create a directory  Usage: create <NAME> [include --file to create a file]"""
         try:
             if args.file:
                 created = self.manager.create_file(str(args.name))
-                print("created!")
+                type_created = "File"
             else:
                 created = self.manager.create_directory(args.name)
+                type_created = "Directory"
+            if created:
+                print(f"{type_created} created successfully.")
+            else:
+                ("Something went wrong.")
         except Exception as e:
             # TODO add more specific exception excepts to give a better error message
             print(f"oopsie")
@@ -77,24 +82,28 @@ class FileSystemCli(cmd2.Cmd):
     @cmd2.with_category(help_category)
     @cmd2.with_argparser(change_dir_argparser)
     def do_change_dir(self, args) -> None:
-        """Change the current directory. Usage: change_dir <directory_name>"""
+        """Change the current directory. Usage: change_dir <DIRECTORY NAME>"""
+        # TODO move the majority of logic out of this function
+        # TODO implement search and add ability to move to a different directory
         try:
-            # Move to child directory
+            # If the directory name is in the current directory's list of children
             if args.dir_name in self.manager.current_directory.children.keys():
                 target_node = self.manager.current_directory.children[args.dir_name]
-                if target_node.type == NodeType.FILE:
-                    print(f"{args.dir_name} is a file, not a directory")
+                # if the target node is a file, it can not be the current directory
+                if target_node.type != str(NodeType.FILE):
+                    print(f"{args.dir_name} is a file, not a directory.")
                     return
+                # Update the current directory to the child
                 self.manager.update_to_child(args.dir_name)
                 return
-            elif self.manager.current_directory:
-                    if args.dir_name == self.manager.current_directory.parent:
-                        self.manager.update_to_parent()
+            # If the directory name is the parent
+            elif args.dir_name == self.manager.current_directory.parent:
+                    # Update to the parent directory
+                    self.manager.update_to_parent()
                     return
-                # TODO implement search and add ability to move to a different directory
             # move to parent directory
             elif self.manager.current_path == self.manager.file_system.root:
-                print("Already at root directory")
+                print("Already at root directory.")
                 return
             else:
                 print(f"{args.dir_name} is not a parent or child of the current working directory")
@@ -130,7 +139,7 @@ class FileSystemCli(cmd2.Cmd):
     @cmd2.with_category(help_category)
     @cmd2.with_argparser(search_argparser)
     def do_search(self, args):
-        """search for a file or directory Usage: search <search_term>"""
+        """Search for a file or directory. Usage: search <search_term>"""
         try:
             search_results = self.manager.search(args.search_term)
             if not search_results:
@@ -143,9 +152,10 @@ class FileSystemCli(cmd2.Cmd):
             print(f"oopsie")
             print(e)
 
+    #WIP to switch user to different user with different permissions
     @cmd2.with_category(help_category)
     @cmd2.with_argparser(switch_argparser)
-    def do_switch(self, args):
+    def switch(self, args):
         try:
             print(self.manager.user)
             if args.user in Users.keys():
