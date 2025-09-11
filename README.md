@@ -44,21 +44,21 @@ $ pytest
 
 ## Functionality
 
-`change_dir <directory_to_change_to>`
+`change_dir <DIRECTORY NAME>`  -- Change the current directory to a child or parent directory
 
-`create <name>` (include optional  `--file` to make a file instead of directory)  
+`create <NAME>`  -- Create a directory or include optional `--file` at end of command to make a file
 
-`list`  will return list of files and directories of current directory
+`list_contents` -- Get a list of files and directories of current directory
 
-`path`  will list the path of the current directory
+`path` -- List the path of the current directory
 
-`read <file_name>` will return file content
+`read <FILE NAME>` -- Read file content
 
-`search <search_term>` search for all files and directories with a certain term
+`search <SEARCH TERM>` -- Search for all files and directories with a certain term
 
-`write <file_to_write_to>` add content to a file 
+`write <FILE NAME> <CONTENTS>` -- Write to a file 
 
-`help` get help
+`help` -- Get help
 
 ## Future functionality (partially implemented):
 

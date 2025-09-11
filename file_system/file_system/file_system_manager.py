@@ -1,6 +1,6 @@
 from typing import List
-from file_system.file_system.constants import SLASH, NodeType, Permission, Users
-from file_system.file_system.models import FileSystem, Node
+from file_system.constants import SLASH, NodeType, Permission, Users
+from file_system.models import FileSystem, Node
 
 class FileSystemManager():
     def __init__(self):

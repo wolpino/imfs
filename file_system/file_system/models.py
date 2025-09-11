@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from file_system.file_system.constants import NodeType, Permission
+from file_system.constants import NodeType, Permission
 
 
 class Node:
