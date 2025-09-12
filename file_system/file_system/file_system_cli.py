@@ -1,55 +1,38 @@
 import logging
 import cmd2
 from constants import NodeType, Users, help_category
+from helpers import args_change_dir, args_create, args_read, args_search, args_write
 from file_system_manager import FileSystemManager
 
 class FileSystemCli(cmd2.Cmd):
     intro = "Welcome to your in memory file system"
     prompt = '>>imfs>> '
 
-    logger = logging.Logger
+    # TODO finish setting up logger
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(filename='debug.log', encoding='utf-8', level=logging.INFO)
     
     def __init__(self):
         super().__init__()
         self.manager = FileSystemManager()
         
-    #TODO refactor to parser file
-    create_argparser = cmd2.Cmd2ArgumentParser()
-    create_argparser.add_argument('name', type=str, help= "The name of the new directory or file.")
-    create_argparser.add_argument('-f', '--file', action='store_true', help="Add --file to create a file")
-    # create_argparser.add_argument('-p', '--permission', type=str, choices=["Lisa","Bart","Marge","Homer"], help="set read/write permissions on files and directories")
-
-    change_dir_argparser = cmd2.Cmd2ArgumentParser()
-    change_dir_argparser.add_argument('dir_name', type=str, help= "Directory to move to")
-
-    write_argparser = cmd2.Cmd2ArgumentParser()
-    write_argparser.add_argument('name', type=str, help= "File to write to")
-    write_argparser.add_argument('content', type=str, help="Content to add to file")
-
-    read_argparser = cmd2.Cmd2ArgumentParser()
-    read_argparser.add_argument('name', type=str, help= "Name of file you want to read")
-
-    search_argparser = cmd2.Cmd2ArgumentParser()
-    search_argparser.add_argument('search_term', type=str, help= "Name of file/directory you'd like to search for")
-
-    switch_argparser = cmd2.Cmd2ArgumentParser()
-    # switch_argparser.add_argument('user', type=str, choices=["Lisa","Bart","Marge","Homer"], help="Switch to a new user by choosing from the choices")
-
-    general_argparser = cmd2.Cmd2ArgumentParser()
+    args_create = args_create()
+    args_change_dir = args_change_dir()
+    args_write = args_write()
+    args_read = args_read()
+    args_search = args_search()
 
     @cmd2.with_category(help_category)
-    @cmd2.with_argparser(general_argparser)
     def do_path(self, args):
         """Returns the current directory path. Usage: path"""
         try:
             path = self.manager.get_path()
             print(path)
         except Exception as e:
-            # TODO add more specific exception excepts to give a better error message
-            print(f"oopsie")
+            logging.info("There was a problem, check log file for more details.")
+            logging.debug(e)
 
     @cmd2.with_category(help_category)
-    @cmd2.with_argparser(general_argparser)
     def do_list_contents(self, args):
         """Returns list of files and directories in the current directory. Usage: list_contents"""
         try:
@@ -60,7 +43,7 @@ class FileSystemCli(cmd2.Cmd):
             print(f"oopsie")
 
     @cmd2.with_category(help_category)
-    @cmd2.with_argparser(create_argparser)
+    @cmd2.with_argparser(args_create)
     def do_create(self, args):
         """ Create a directory  Usage: create <NAME> [include --file to create a file]"""
         try:
@@ -80,7 +63,7 @@ class FileSystemCli(cmd2.Cmd):
             print(e)
 
     @cmd2.with_category(help_category)
-    @cmd2.with_argparser(change_dir_argparser)
+    @cmd2.with_argparser(args_change_dir)
     def do_change_dir(self, args) -> None:
         """Change the current directory. Usage: change_dir <DIRECTORY NAME>"""
         # TODO move the majority of logic out of this function
@@ -113,7 +96,7 @@ class FileSystemCli(cmd2.Cmd):
             print(e)
 
     @cmd2.with_category(help_category)
-    @cmd2.with_argparser(write_argparser)
+    @cmd2.with_argparser(args_write)
     def do_write(self, args):
         """Write content to a file. Usage: write <file_name> <content>"""
         try:
@@ -125,7 +108,7 @@ class FileSystemCli(cmd2.Cmd):
             print(e)
 
     @cmd2.with_category(help_category)
-    @cmd2.with_argparser(read_argparser)
+    @cmd2.with_argparser(args_read)
     def do_read(self, args):
         """Read the content of a file. Usage: read <file_name>"""
         try:
@@ -137,7 +120,7 @@ class FileSystemCli(cmd2.Cmd):
             print(e)
 
     @cmd2.with_category(help_category)
-    @cmd2.with_argparser(search_argparser)
+    @cmd2.with_argparser(args_search)
     def do_search(self, args):
         """Search for a file or directory. Usage: search <search_term>"""
         try:
@@ -154,7 +137,6 @@ class FileSystemCli(cmd2.Cmd):
 
     #WIP to switch user to different user with different permissions
     @cmd2.with_category(help_category)
-    @cmd2.with_argparser(switch_argparser)
     def switch(self, args):
         try:
             print(self.manager.user)
