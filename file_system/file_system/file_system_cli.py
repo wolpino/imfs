@@ -1,4 +1,4 @@
-import logging
+from base_logger import log
 import cmd2
 from constants import NodeType, Users, help_category
 from helpers import args_change_dir, args_create, args_read, args_search, args_write
@@ -8,10 +8,6 @@ class FileSystemCli(cmd2.Cmd):
     intro = "Welcome to your in memory file system"
     prompt = '>>imfs>> '
 
-    # TODO finish setting up logger
-    logger = logging.getLogger(__name__)
-    logging.basicConfig(filename='debug.log', encoding='utf-8', level=logging.INFO)
-    
     def __init__(self):
         super().__init__()
         self.manager = FileSystemManager()
@@ -28,9 +24,9 @@ class FileSystemCli(cmd2.Cmd):
         try:
             path = self.manager.get_path()
             print(path)
-        except Exception as e:
-            logging.info("There was a problem, check log file for more details.")
-            logging.debug(e)
+        except KeyError as e:
+            print("There was a problem, check log file for more details.")
+            log.debug(e.with_traceback)
 
     @cmd2.with_category(help_category)
     def do_list_contents(self, args):
@@ -39,8 +35,8 @@ class FileSystemCli(cmd2.Cmd):
            list = self.manager.list_children()    
            print(list) 
         except Exception as e:
-            # TODO add more specific exception excepts to give a better error message
-            print(f"oopsie")
+            print("There was a problem, check log file for more details.")
+            log.debug(e.with_traceback)
 
     @cmd2.with_category(help_category)
     @cmd2.with_argparser(args_create)
@@ -59,8 +55,8 @@ class FileSystemCli(cmd2.Cmd):
                 ("Something went wrong.")
         except Exception as e:
             # TODO add more specific exception excepts to give a better error message
-            print(f"oopsie")
-            print(e)
+            print("There was a problem, check log file for more details.")
+            log.debug(e.with_traceback)
 
     @cmd2.with_category(help_category)
     @cmd2.with_argparser(args_change_dir)
@@ -92,8 +88,8 @@ class FileSystemCli(cmd2.Cmd):
                 print(f"{args.dir_name} is not a parent or child of the current working directory")
         except Exception as e:
             # TODO add more specific exception excepts to give a better error message
-            print(f"oopsie")
-            print(e)
+            print("There was a problem, check log file for more details.")
+            log.debug(e.with_traceback)
 
     @cmd2.with_category(help_category)
     @cmd2.with_argparser(args_write)
@@ -104,8 +100,8 @@ class FileSystemCli(cmd2.Cmd):
             print(f"Content written to {args.name}")
         except Exception as e:
             # TODO add more specific exception excepts to give a better error message
-            print(f"oopsie")
-            print(e)
+            print("There was a problem, check log file for more details.")
+            log.debug(e.with_traceback)
 
     @cmd2.with_category(help_category)
     @cmd2.with_argparser(args_read)
@@ -116,8 +112,8 @@ class FileSystemCli(cmd2.Cmd):
             print(content_to_read) # TODO enhance output
         except Exception as e:
             # TODO add more specific exception excepts to give a better error message
-            print(f"oopsie")
-            print(e)
+            print("There was a problem, check log file for more details.")
+            log.debug(e.with_traceback)
 
     @cmd2.with_category(help_category)
     @cmd2.with_argparser(args_search)
@@ -132,8 +128,8 @@ class FileSystemCli(cmd2.Cmd):
                     print(result)
         except Exception as e:
             # TODO add more specific exception excepts to give a better error message
-            print(f"oopsie")
-            print(e)
+            print("There was a problem, check log file for more details.")
+            log.debug(e)
 
     #WIP to switch user to different user with different permissions
     @cmd2.with_category(help_category)
@@ -147,9 +143,9 @@ class FileSystemCli(cmd2.Cmd):
                 print("Currently the only users are Lisa, Bart, Marge, and Homer")
         except Exception as e:
             # TODO add more specific exception excepts to give a better error message
-            print(f"oopsie")
-            print(e)
+            print("There was a problem, check log file for more details.")
+            log.debug(e.with_traceback)
     
     
-if __name__ == "__main__":
+if __name__ == "__main__":    
     FileSystemCli().cmdloop()    
