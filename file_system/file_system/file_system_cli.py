@@ -8,8 +8,8 @@ class FileSystemCli(cmd2.Cmd):
     intro = "Welcome to your in memory file system"
     prompt = '>>imfs>> '
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.manager = FileSystemManager()
         
     args_create = args_create()
@@ -24,7 +24,7 @@ class FileSystemCli(cmd2.Cmd):
         try:
             path = self.manager.get_path()
             print(path)
-        except KeyError as e:
+        except Exception as e:
             print("There was a problem, check log file for more details.")
             log.debug(e.with_traceback)
 
@@ -50,7 +50,7 @@ class FileSystemCli(cmd2.Cmd):
                 created = self.manager.create_directory(args.name)
                 type_created = "Directory"
             if created:
-                print(f"{type_created} created successfully.")
+                print(f"{type_created} {created.name} created successfully.")
             else:
                 ("Something went wrong.")
         except Exception as e:
@@ -69,9 +69,9 @@ class FileSystemCli(cmd2.Cmd):
             if args.dir_name in self.manager.current_directory.children.keys():
                 target_node = self.manager.current_directory.children[args.dir_name]
                 # if the target node is a file, it can not be the current directory
-                if target_node.type != str(NodeType.FILE):
+                if target_node.type == str(NodeType.FILE):
                     print(f"{args.dir_name} is a file, not a directory.")
-                    return
+                    return 
                 # Update the current directory to the child
                 self.manager.update_to_child(args.dir_name)
                 return
@@ -97,7 +97,7 @@ class FileSystemCli(cmd2.Cmd):
         """Write content to a file. Usage: write <file_name> <content>"""
         try:
             fileNode = self.manager.write(args.name, args.content)
-            print(f"Content written to {args.name}")
+            print(f"Content written to {args.name}.")
         except Exception as e:
             # TODO add more specific exception excepts to give a better error message
             print("There was a problem, check log file for more details.")
