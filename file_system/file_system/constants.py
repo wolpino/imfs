@@ -19,5 +19,3 @@ Users = {"Lisa":{"permission": 3},
         "Bart":{"permission": 1}, 
         "Marge":{"permission": 2}, 
         "Homer":{"permission": 0}}
-
-

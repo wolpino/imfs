@@ -1,3 +1,4 @@
+from base_logger import log
 from typing import List
 from file_system.constants import SLASH, NodeType, Permission, Users
 from file_system.models import FileSystem, Node
@@ -21,7 +22,6 @@ class FileSystemManager():
     # TODO add an optional variable + function to get path for any file/dir
     def get_path(self) -> str:
         if self.current_directory.name == self.file_system.root:
-            print(self.user)
             return SLASH
         else:     
             return f"{SLASH}{SLASH.join(self.current_path[1:])}"
@@ -42,9 +42,15 @@ class FileSystemManager():
                     depth=+1
                     self._walk_subtree(current_dir.children[child], path, depth)
         return f"{SLASH}{SLASH.join(path[1:])}"       
-        
+           
+    def walk_to_depth(self, depth: int):
+        self.requested_depth = depth
+        results = self._walk_subtree(self.file_system.root, ["/"] , 0)
+        return results
+    
     # depth first search from current directory
     def _dfs(self, current: Node, search_results: List[str], path:List[str]) -> List[str]:
+        # if the node is a match add to search results
         if current.name == self.search_term:
             path_name = f"{SLASH}{SLASH.join(path[1:])}"
             search_results.append(path_name)
@@ -60,11 +66,7 @@ class FileSystemManager():
         self.search_term = search_term
         results = self._dfs(self.current_directory, search_results, self.current_path)
         return results
-    
-    def walk_to_depth(self, depth: int):
-        self.requested_depth = depth
-        results = self._walk_subtree(self.file_system.root, ["/"] , 0)
-        return results
+ 
 
     # change current directory to a child directory
     def update_to_child(self, dir_name: str) -> None:       
@@ -103,9 +105,7 @@ class FileSystemManager():
             file_node = Node(name=name, type=NodeType.FILE)
             self.current_directory.children[file_node.name] = file_node
             file_node.parent = self.current_directory
-            print(file_node)
             return file_node
-
         except Exception as e:
             print(e.__dict__)
             raise e
